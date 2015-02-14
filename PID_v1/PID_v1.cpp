@@ -112,12 +112,9 @@ void PID::SetTunings(float Kp, float Ki, float Kd)
         kd = Kd;
     }
     
-    if(controllerDirection == REVERSE)
-    {
-       kp = (0 - kp);
-       ki = (0 - ki);
-       kd = (0 - kd);
-    }
+    kp = kp * controllerDirection;
+    ki = ki * controllerDirection;
+    kd = kd * controllerDirection;
 }
   
 /* SetSampleTime(...) *********************************************************

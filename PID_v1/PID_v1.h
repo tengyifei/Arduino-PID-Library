@@ -10,7 +10,7 @@ class PID
 
     //Parameter types for some of the functions below
     enum mode_t { AUTOMATIC = 1, MANUAL = 0 };
-    enum direction_t { DIRECT = 0, REVERSE = 1 };
+    enum direction_t { DIRECT = 1, REVERSE = -1 };
     enum resolution_t { MILLIS = 0, MICROS = 1 };
 
     //commonly used functions **************************************************************************
