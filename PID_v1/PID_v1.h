@@ -8,12 +8,10 @@ class PID
 
   public:
 
-    //Constants used in some of the functions below
-    #define MILLIS  0
-    #define MICROS  1
     //Parameter types for some of the functions below
     enum mode_t { AUTOMATIC = 1, MANUAL = 0 };
     enum direction_t { DIRECT = 0, REVERSE = 1 };
+    enum resolution_t { MILLIS = 0, MICROS = 1 };
 
     //commonly used functions **************************************************************************
     PID(double*, double*, double*,        // * constructor.  links the PID to the Input, Output, and 
@@ -43,7 +41,7 @@ class PID
 										  //   once it is set in the constructor.
     void SetSampleTime(int);              // * sets the frequency, in Milliseconds, with which 
                                           //   the PID calculation is performed.  default is 100
-    void SetResolution(int);			  // * Set the resolution of the GetTime() function. 
+    void SetResolution(resolution_t);     // * Set the resolution of the GetTime() function. 
     									  //   MILLIS sets the resolution to milliseconds.
     									  //   MICROS sets the resolution to microseconds.
 										  

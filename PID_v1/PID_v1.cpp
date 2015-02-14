@@ -224,7 +224,7 @@ unsigned long PID::GetTime()
  * MILLIS will set the resolution to milliseconds while
  * MICROS will set the resolution to microseconds.
  ******************************************************************************/
-void PID::SetResolution(int resolution)
+void PID::SetResolution(resolution_t resolution)
 {
   if (resolution == MILLIS)
     secondsDivider = 1000.0;
