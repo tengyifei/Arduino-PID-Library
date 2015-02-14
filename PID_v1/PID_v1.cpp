@@ -48,7 +48,7 @@ bool PID::Compute()
    if(!inAuto) return false;
    unsigned long now = PID::GetTime();
    timeChange = (now - lastTime);
-   if(SampleTime == 0 || timeChange>=SampleTime)
+   if(SampleTime == 0 || timeChange >= SampleTime)
    {
       /*Compute all the working error variables*/
 	  double input = *myInput;
@@ -61,18 +61,24 @@ bool PID::Compute()
         ITerm += ICurrent;
         dInput = (input - lastInput);
       } else {
-        ITerm += ICurrent*(((double)timeChange)/secondsDivider);
-        dInput = (input - lastInput)/(((double)timeChange)/secondsDivider);
+        ITerm += ICurrent*(((double)timeChange) / secondsDivider);
+        dInput = (input - lastInput) / (((double)timeChange) / secondsDivider);
       }
 
-      if(ITerm > outMax) ITerm= outMax;
-      else if(ITerm < outMin) ITerm= outMin;
+      if(ITerm > outMax)
+        ITerm = outMax;
+      else
+        if(ITerm < outMin)
+            ITerm = outMin;
  
       /*Compute PID Output*/
-      double output = kp * error + ITerm- kd * dInput;
+      double output = kp * error + ITerm - kd * dInput;
       
-	  if(output > outMax) output = outMax;
-      else if(output < outMin) output = outMin;
+	  if(output > outMax)
+        output = outMax;
+      else
+        if(output < outMin)
+            output = outMin;
 	  *myOutput = output;
 	  
       /*Remember some variables for next time*/
@@ -91,12 +97,12 @@ bool PID::Compute()
  ******************************************************************************/ 
 void PID::SetTunings(double Kp, double Ki, double Kd)
 {
-   if (Kp<0 || Ki<0 || Kd<0) return;
+   if (Kp < 0 || Ki < 0 || Kd < 0) return;
  
    dispKp = Kp; dispKi = Ki; dispKd = Kd;
 
    if (SampleTime > 0) {
-    double SampleTimeInSec = ((double)SampleTime)/secondsDivider;  
+    double SampleTimeInSec = ((double)SampleTime) / secondsDivider;  
     kp = Kp;
     ki = Ki * SampleTimeInSec;
     kd = Kd / SampleTimeInSec;
@@ -106,7 +112,7 @@ void PID::SetTunings(double Kp, double Ki, double Kd)
     kd = Kd;
    }
  
-  if(controllerDirection ==REVERSE)
+  if(controllerDirection == REVERSE)
    {
       kp = (0 - kp);
       ki = (0 - ki);
@@ -125,13 +131,13 @@ void PID::SetSampleTime(int NewSampleTime)
    {
       double ratio;
       if (SampleTime > 0)
-        ratio = (double)NewSampleTime/(double)SampleTime;
+        ratio = (double)NewSampleTime / (double)SampleTime;
       else
-        ratio = (double)NewSampleTime/(double)timeChange; // We will assume the user is calling Compute at a regular interval
+        ratio = (double)NewSampleTime / (double)timeChange; // We will assume the user is calling Compute at a regular interval
 
       ki *= ratio;
       kd /= ratio;
-      SampleTime = (unsigned long)NewSampleTime;
+      SampleTime = (unsigned long) NewSampleTime;
    } else
       SampleTime = 0; // We will compute every time the function is called
 }
@@ -155,8 +161,8 @@ void PID::SetOutputLimits(double Min, double Max)
 	   if(*myOutput > outMax) *myOutput = outMax;
 	   else if(*myOutput < outMin) *myOutput = outMin;
 	 
-	   if(ITerm > outMax) ITerm= outMax;
-	   else if(ITerm < outMin) ITerm= outMin;
+	   if(ITerm > outMax) ITerm = outMax;
+	   else if(ITerm < outMin) ITerm = outMin;
    }
 }
 
