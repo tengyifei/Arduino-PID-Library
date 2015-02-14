@@ -53,13 +53,15 @@ bool PID::Compute()
       /*Compute all the working error variables*/
 	  double input = *myInput;
       double error = *mySetpoint - input;
+      double prevError = *mySetpoint - lastInput;
 
       double dInput;
+      double ICurrent = ki * (error + prevError) / 2.0;
       if (SampleTime > 0) {
-        ITerm += (ki * error);
+        ITerm += ICurrent;
         dInput = (input - lastInput);
       } else {
-        ITerm += (ki * error)*(((double)timeChange)/secondsDivider);
+        ITerm += ICurrent*(((double)timeChange)/secondsDivider);
         dInput = (input - lastInput)/(((double)timeChange)/secondsDivider);
       }
 
