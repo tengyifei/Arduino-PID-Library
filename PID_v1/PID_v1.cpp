@@ -241,6 +241,6 @@ void PID::SetResolution(resolution_t resolution)
 float PID::GetKp(){ return  dispKp; }
 float PID::GetKi(){ return  dispKi;}
 float PID::GetKd(){ return  dispKd;}
-mode_t PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL; }
-direction_t PID::GetDirection(){ return controllerDirection; }
+PID::mode_t PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL; }
+PID::direction_t PID::GetDirection(){ return controllerDirection; }
 

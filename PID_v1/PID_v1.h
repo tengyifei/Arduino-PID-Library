@@ -67,7 +67,7 @@ class PID
     float ki;                   // * (I)ntegral Tuning Parameter
     float kd;                   // * (D)erivative Tuning Parameter
 
-    int controllerDirection;
+    direction_t controllerDirection;
 
     float *myInput;              // * Pointers to the Input, Output, and Setpoint variables
     float *myOutput;             //   This creates a hard link between the variables and the 
