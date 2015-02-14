@@ -17,8 +17,8 @@
  *    The parameters specified here are those for for which we can't set up 
  *    reliable defaults, so we need to have the user set them.
  ***************************************************************************/
-PID::PID(double* Input, double* Output, double* Setpoint,
-        double Kp, double Ki, double Kd, direction_t ControllerDirection)
+PID::PID(float* Input, float* Output, float* Setpoint,
+        float Kp, float Ki, float Kd, direction_t ControllerDirection)
 {
 	
     myOutput = Output;
@@ -51,18 +51,18 @@ bool PID::Compute()
    if(SampleTime == 0 || timeChange >= SampleTime)
    {
       /*Compute all the working error variables*/
-	  double input = *myInput;
-      double error = *mySetpoint - input;
-      double prevError = *mySetpoint - lastInput;
+	  float input = *myInput;
+      float error = *mySetpoint - input;
+      float prevError = *mySetpoint - lastInput;
 
-      double dInput;
-      double ICurrent = ki * (error + prevError) / 2.0;
+      float dInput;
+      float ICurrent = ki * (error + prevError) / 2.0f;
       if (SampleTime > 0) {
         ITerm += ICurrent;
         dInput = (input - lastInput);
       } else {
-        ITerm += ICurrent*(((double)timeChange) / secondsDivider);
-        dInput = (input - lastInput) / (((double)timeChange) / secondsDivider);
+        ITerm += ICurrent*(((float)timeChange) / secondsDivider);
+        dInput = (input - lastInput) / (((float)timeChange) / secondsDivider);
       }
 
       if(ITerm > outMax)
@@ -72,7 +72,7 @@ bool PID::Compute()
             ITerm = outMin;
  
       /*Compute PID Output*/
-      double output = kp * error + ITerm - kd * dInput;
+      float output = kp * error + ITerm - kd * dInput;
       
 	  if(output > outMax)
         output = outMax;
@@ -95,14 +95,14 @@ bool PID::Compute()
  * it's called automatically from the constructor, but tunings can also
  * be adjusted on the fly during normal operation
  ******************************************************************************/ 
-void PID::SetTunings(double Kp, double Ki, double Kd)
+void PID::SetTunings(float Kp, float Ki, float Kd)
 {
    if (Kp < 0 || Ki < 0 || Kd < 0) return;
  
    dispKp = Kp; dispKi = Ki; dispKd = Kd;
 
    if (SampleTime > 0) {
-    double SampleTimeInSec = ((double)SampleTime) / secondsDivider;  
+    float SampleTimeInSec = ((float)SampleTime) / secondsDivider;  
     kp = Kp;
     ki = Ki * SampleTimeInSec;
     kd = Kd / SampleTimeInSec;
@@ -129,11 +129,11 @@ void PID::SetSampleTime(int NewSampleTime)
 {
    if (NewSampleTime > 0)
    {
-      double ratio;
+      float ratio;
       if (SampleTime > 0)
-        ratio = (double)NewSampleTime / (double)SampleTime;
+        ratio = (float)NewSampleTime / (float)SampleTime;
       else
-        ratio = (double)NewSampleTime / (double)timeChange; // We will assume the user is calling Compute at a regular interval
+        ratio = (float)NewSampleTime / (float)timeChange; // We will assume the user is calling Compute at a regular interval
 
       ki *= ratio;
       kd /= ratio;
@@ -150,7 +150,7 @@ void PID::SetSampleTime(int NewSampleTime)
  *  want to clamp it from 0-125.  who knows.  at any rate, that can all be done
  *  here.
  **************************************************************************/
-void PID::SetOutputLimits(double Min, double Max)
+void PID::SetOutputLimits(float Min, float Max)
 {
    if(Min >= Max) return;
    outMin = Min;
@@ -215,7 +215,7 @@ void PID::SetControllerDirection(direction_t Direction)
  ******************************************************************************/
 unsigned long PID::GetTime()
 {
-  if (secondsDivider == 1000.0) return millis();
+  if (secondsDivider == 1000.0f) return millis();
   return micros();
 }
 
@@ -227,9 +227,9 @@ unsigned long PID::GetTime()
 void PID::SetResolution(resolution_t resolution)
 {
   if (resolution == MILLIS)
-    secondsDivider = 1000.0;
+    secondsDivider = 1000.0f;
   else
-    secondsDivider = 1000000.0;
+    secondsDivider = 1000000.0f;
   lastTime = PID::GetTime()-SampleTime; // Update last time variable
 }
 
@@ -238,9 +238,9 @@ void PID::SetResolution(resolution_t resolution)
  * functions query the internal state of the PID.  they're here for display 
  * purposes.  this are the functions the PID Front-end uses for example
  ******************************************************************************/
-double PID::GetKp(){ return  dispKp; }
-double PID::GetKi(){ return  dispKi;}
-double PID::GetKd(){ return  dispKd;}
-int PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL;}
-int PID::GetDirection(){ return controllerDirection;}
+float PID::GetKp(){ return  dispKp; }
+float PID::GetKi(){ return  dispKi;}
+float PID::GetKd(){ return  dispKd;}
+mode_t PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL; }
+direction_t PID::GetDirection(){ return controllerDirection; }
 
