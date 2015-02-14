@@ -20,16 +20,16 @@
 PID::PID(float* Input, float* Output, float* Setpoint,
         float Kp, float Ki, float Kd, direction_t ControllerDirection)
 {
-	
+    
     myOutput = Output;
     myInput = Input;
     mySetpoint = Setpoint;
-	inAuto = false;
-	
-	PID::SetOutputLimits(0, 255);				//default output limit corresponds to 
-												//the arduino pwm limits
+    inAuto = false;
+    
+    PID::SetOutputLimits(0, 255);               //default output limit corresponds to 
+                                                //the arduino pwm limits
 
-    SampleTime = 100;							//default Controller Sample Time is 0.1 seconds
+    SampleTime = 100;                           //default Controller Sample Time is 0.1 seconds
 
     PID::SetControllerDirection(ControllerDirection);
     PID::SetResolution(MILLIS); // Use a resolution of milliseconds by default
@@ -45,47 +45,47 @@ PID::PID(float* Input, float* Output, float* Setpoint,
  **********************************************************************************/ 
 bool PID::Compute()
 {
-   if(!inAuto) return false;
-   unsigned long now = PID::GetTime();
-   timeChange = (now - lastTime);
-   if(SampleTime == 0 || timeChange >= SampleTime)
-   {
-      /*Compute all the working error variables*/
-	  float input = *myInput;
-      float error = *mySetpoint - input;
-      float prevError = *mySetpoint - lastInput;
-
-      float dInput;
-      float ICurrent = ki * (error + prevError) / 2.0f;
-      if (SampleTime > 0) {
-        ITerm += ICurrent;
-        dInput = (input - lastInput);
-      } else {
-        ITerm += ICurrent*(((float)timeChange) / secondsDivider);
-        dInput = (input - lastInput) / (((float)timeChange) / secondsDivider);
-      }
-
-      if(ITerm > outMax)
-        ITerm = outMax;
-      else
-        if(ITerm < outMin)
-            ITerm = outMin;
- 
-      /*Compute PID Output*/
-      float output = kp * error + ITerm - kd * dInput;
-      
-	  if(output > outMax)
-        output = outMax;
-      else
-        if(output < outMin)
-            output = outMin;
-	  *myOutput = output;
-	  
-      /*Remember some variables for next time*/
-      lastInput = input;
-      lastTime = now;
-	  return true;
-   }
+    if(!inAuto) return false;
+    unsigned long now = PID::GetTime();
+    timeChange = (now - lastTime);
+    if(SampleTime == 0 || timeChange >= SampleTime)
+    {
+        /*Compute all the working error variables*/
+        float input = *myInput;
+        float error = *mySetpoint - input;
+        float prevError = *mySetpoint - lastInput;
+        
+        float dInput;
+        float ICurrent = ki * (error + prevError) / 2.0f;
+        if (SampleTime > 0) {
+            ITerm += ICurrent;
+            dInput = (input - lastInput);
+        } else {
+            ITerm += ICurrent*(((float)timeChange) / secondsDivider);
+            dInput = (input - lastInput) / (((float)timeChange) / secondsDivider);
+        }
+        
+        if(ITerm > outMax)
+            ITerm = outMax;
+        else
+            if(ITerm < outMin)
+                ITerm = outMin;
+        
+        /*Compute PID Output*/
+        float output = kp * error + ITerm - kd * dInput;
+        
+        if(output > outMax)
+            output = outMax;
+        else
+            if(output < outMin)
+                output = outMin;
+        *myOutput = output;
+        
+        /*Remember some variables for next time*/
+        lastInput = input;
+        lastTime = now;
+        return true;
+    }
    else return false;
 }
 
@@ -97,27 +97,27 @@ bool PID::Compute()
  ******************************************************************************/ 
 void PID::SetTunings(float Kp, float Ki, float Kd)
 {
-   if (Kp < 0 || Ki < 0 || Kd < 0) return;
- 
-   dispKp = Kp; dispKi = Ki; dispKd = Kd;
-
-   if (SampleTime > 0) {
-    float SampleTimeInSec = ((float)SampleTime) / secondsDivider;  
-    kp = Kp;
-    ki = Ki * SampleTimeInSec;
-    kd = Kd / SampleTimeInSec;
-   } else {
-    kp = Kp;
-    ki = Ki;
-    kd = Kd;
-   }
- 
-  if(controllerDirection == REVERSE)
-   {
-      kp = (0 - kp);
-      ki = (0 - ki);
-      kd = (0 - kd);
-   }
+    if (Kp < 0 || Ki < 0 || Kd < 0) return;
+    
+    dispKp = Kp; dispKi = Ki; dispKd = Kd;
+    
+    if (SampleTime > 0) {
+        float SampleTimeInSec = ((float)SampleTime) / secondsDivider;  
+        kp = Kp;
+        ki = Ki * SampleTimeInSec;
+        kd = Kd / SampleTimeInSec;
+    } else {
+        kp = Kp;
+        ki = Ki;
+        kd = Kd;
+    }
+    
+    if(controllerDirection == REVERSE)
+    {
+       kp = (0 - kp);
+       ki = (0 - ki);
+       kd = (0 - kd);
+    }
 }
   
 /* SetSampleTime(...) *********************************************************
@@ -127,19 +127,19 @@ void PID::SetTunings(float Kp, float Ki, float Kd)
  ******************************************************************************/
 void PID::SetSampleTime(int NewSampleTime)
 {
-   if (NewSampleTime > 0)
-   {
-      float ratio;
-      if (SampleTime > 0)
-        ratio = (float)NewSampleTime / (float)SampleTime;
-      else
-        ratio = (float)NewSampleTime / (float)timeChange; // We will assume the user is calling Compute at a regular interval
-
-      ki *= ratio;
-      kd /= ratio;
-      SampleTime = (unsigned long) NewSampleTime;
-   } else
-      SampleTime = 0; // We will compute every time the function is called
+    if (NewSampleTime > 0)
+    {
+        float ratio;
+        if (SampleTime > 0)
+            ratio = (float)NewSampleTime / (float)SampleTime;
+        else
+            ratio = (float)NewSampleTime / (float)timeChange; // We will assume the user is calling Compute at a regular interval
+        
+        ki *= ratio;
+        kd /= ratio;
+        SampleTime = (unsigned long) NewSampleTime;
+    } else
+        SampleTime = 0; // We will compute every time the function is called
 }
  
 /* SetOutputLimits(...)****************************************************
@@ -152,18 +152,18 @@ void PID::SetSampleTime(int NewSampleTime)
  **************************************************************************/
 void PID::SetOutputLimits(float Min, float Max)
 {
-   if(Min >= Max) return;
-   outMin = Min;
-   outMax = Max;
- 
-   if(inAuto)
-   {
-	   if(*myOutput > outMax) *myOutput = outMax;
-	   else if(*myOutput < outMin) *myOutput = outMin;
-	 
-	   if(ITerm > outMax) ITerm = outMax;
-	   else if(ITerm < outMin) ITerm = outMin;
-   }
+    if(Min >= Max) return;
+    outMin = Min;
+    outMax = Max;
+    
+    if(inAuto)
+    {
+        if(*myOutput > outMax) *myOutput = outMax;
+        else if(*myOutput < outMin) *myOutput = outMin;
+      
+        if(ITerm > outMax) ITerm = outMax;
+        else if(ITerm < outMin) ITerm = outMin;
+    }
 }
 
 /* SetMode(...)****************************************************************
@@ -182,7 +182,7 @@ void PID::SetMode(mode_t Mode)
 }
  
 /* Initialize()****************************************************************
- *	does all the things that need to happen to ensure a bumpless transfer
+ *  does all the things that need to happen to ensure a bumpless transfer
  *  from manual to automatic mode.
  ******************************************************************************/ 
 void PID::Initialize()
@@ -201,13 +201,13 @@ void PID::Initialize()
  ******************************************************************************/
 void PID::SetControllerDirection(direction_t Direction)
 {
-   if(inAuto && Direction !=controllerDirection)
-   {
-	  kp = (0 - kp);
-      ki = (0 - ki);
-      kd = (0 - kd);
-   }   
-   controllerDirection = Direction;
+    if(inAuto && Direction !=controllerDirection)
+    {
+        kp = (0 - kp);
+        ki = (0 - ki);
+        kd = (0 - kd);
+    }   
+    controllerDirection = Direction;
 }
 
 /* GetTime()*******************************************************************
@@ -215,8 +215,8 @@ void PID::SetControllerDirection(direction_t Direction)
  ******************************************************************************/
 unsigned long PID::GetTime()
 {
-  if (secondsDivider == 1000.0f) return millis();
-  return micros();
+    if (secondsDivider == 1000.0f) return millis();
+    return micros();
 }
 
 /* SetResolution(...)**********************************************************
@@ -226,11 +226,11 @@ unsigned long PID::GetTime()
  ******************************************************************************/
 void PID::SetResolution(resolution_t resolution)
 {
-  if (resolution == MILLIS)
-    secondsDivider = 1000.0f;
-  else
-    secondsDivider = 1000000.0f;
-  lastTime = PID::GetTime()-SampleTime; // Update last time variable
+    if (resolution == MILLIS)
+      secondsDivider = 1000.0f;
+    else
+      secondsDivider = 1000000.0f;
+    lastTime = PID::GetTime()-SampleTime; // Update last time variable
 }
 
 /* Status Funcions*************************************************************
